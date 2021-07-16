@@ -38,7 +38,7 @@ predicted_close_price = 0
 def predict_price(ticker):
     """Prophet으로 당일 종가 가격 예측"""
     global predicted_close_price
-    df = pyupbit.get_ohlcv("KRW-SBD", count=900, period=1)
+    df = pyupbit.get_ohlcv("KRW-SAND", count=900, period=1)
     df = df.reset_index()
     df['ds'] = df['index']
     df['y'] = df['close']
@@ -52,8 +52,8 @@ def predict_price(ticker):
         closeDf = forecast[forecast['ds'] == data.iloc[-1]['ds'].replace(hour=9)]
     closeValue = closeDf['yhat'].values[0]
     predicted_close_price = closeValue
-predict_price("KRW-SBD")
-schedule.every().hour.do(lambda: predict_price("KRW-SBD"))
+predict_price("KRW-SAND")
+schedule.every().hour.do(lambda: predict_price("KRW-SAND"))
 
 # 로그인
 upbit = pyupbit.Upbit(access, secret)
@@ -63,21 +63,21 @@ print("autotrade start")
 while True:
     try:
         now = datetime.datetime.now()
-        start_time = get_start_time("KRW-SBD")
+        start_time = get_start_time("KRW-SAND")
         end_time = start_time + datetime.timedelta(days=1)
         schedule.run_pending()
 
         if start_time < now < end_time - datetime.timedelta(seconds=10):
-            target_price = get_target_price("KRW-SBD", 0.8)
-            current_price = get_current_price("KRW-SBD")
+            target_price = get_target_price("KRW-SAND", 0.8)
+            current_price = get_current_price("KRW-SAND")
             if target_price < current_price and current_price < predicted_close_price:
                 krw = get_balance("KRW")
                 if krw > 5000:
-                    upbit.buy_market_order("KRW-SBD", krw*0.9995)
+                    upbit.buy_market_order("KRW-SAND", krw*0.9995)
         else:
-            sbd = get_balance("SBD")
-            if sbd > 0.64:
-                upbit.sell_market_order("KRW-SBD", sbd*0.9995)
+            sand = get_balance("SAND")
+            if sand > 0.64:
+                upbit.sell_market_order("KRW-SAND", sand*0.9995)
         time.sleep(1)
     except Exception as e:
         print(e)
