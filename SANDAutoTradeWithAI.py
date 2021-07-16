@@ -76,7 +76,7 @@ while True:
                     upbit.buy_market_order("KRW-SAND", krw*0.9995)
         else:
             sand = get_balance("SAND")
-            if sand > 0.7.444:
+            if sand > 0.7444:
                 upbit.sell_market_order("KRW-SAND", sand*0.9995)
         time.sleep(1)
     except Exception as e:
